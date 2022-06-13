@@ -163,11 +163,12 @@ function addToProject() {
                 return;
             }
             // Remove Item from Project
-            const deletedItemId = yield octokit.graphql(`mutation removeIssueFromProject($input: RemoveProjectNextItemInput!) {
-      deleteProjectNextItem(input: $input) {
-        deletedItemId
+            const deletedItemId = yield octokit.graphql(`mutation removeIssueFromProject($input: DeleteProjectNextItemInput!){
+        deleteProjectNextItem(input: $input) {
+          deletedItemId
+        }
       }
-    }`, {
+      `, {
                 input: {
                     itemId: item.id,
                     projectId

@@ -187,11 +187,12 @@ export async function addToProject(): Promise<void> {
 
     // Remove Item from Project
     const deletedItemId = await octokit.graphql<ProjectAddItemResponse>(
-      `mutation removeIssueFromProject($input: RemoveProjectNextItemInput!) {
-      deleteProjectNextItem(input: $input) {
-        deletedItemId
+      `mutation removeIssueFromProject($input: DeleteProjectNextItemInput!){
+        deleteProjectNextItem(input: $input) {
+          deletedItemId
+        }
       }
-    }`,
+      `,
       {
         input: {
           itemId: item.id,
