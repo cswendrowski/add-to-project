@@ -23,15 +23,15 @@ Create a workflow that runs when Issues or Pull Requests are opened or labeled i
 
 Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory.
 
-##### Example Usage: Issue opened with labels `bug` OR `needs-triage`
+##### Example Usage: Issue milestoned `bug` OR `needs-triage`
 
 ```yaml
-name: Add bugs to bugs project
+name: Add milestone 1 and 2 Issue to Project
 
 on:
   issues:
     types:
-      - opened
+      - [milestoned, demilestoned]
 
 jobs:
   add-to-project:
@@ -42,8 +42,8 @@ jobs:
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          labeled: bug, needs-triage
-          label-operator: OR
+          milestoned: "milestone 1", "milestone 2"
+          remove-unmatched: true
 ```
 
 ##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`

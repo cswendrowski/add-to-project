@@ -28,9 +28,30 @@ interface ProjectAddItemResponse {
   }
 }
 
+interface ProjectNextItem {
+  id: string,
+  content: {
+    id: string
+  }
+}
+
+interface ProjectNextItemResponse {
+  organization?: {
+    projectNext: {
+      items: {
+        pageInfo: {
+          endCursor: string
+          hasNextPage: boolean
+        }
+        nodes: ProjectNextItem[]
+      }
+    }
+  }
+}
+
 export async function addToProject(): Promise<void> {
-  const projectUrl = core.getInput('project-url', {required: true})
-  const ghToken = core.getInput('github-token', {required: true})
+  const projectUrl = core.getInput('project-url', { required: true })
+  const ghToken = core.getInput('github-token', { required: true })
   const labeled =
     core
       .getInput('labeled')
@@ -38,11 +59,20 @@ export async function addToProject(): Promise<void> {
       .map(l => l.trim())
       .filter(l => l.length > 0) ?? []
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
+  const milestoned =
+    core
+      .getInput('milestoned')
+      .split(',')
+      .map(l => l.trim())
+      .filter(l => l.length > 0) ?? []
+  const removeUnmatched = core.getInput("remove-unmatched")
 
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
-  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
+  const issueLabels: string[] = (issue?.labels ?? []).map((l: { name: string }) => l.name)
+  const issueMilestone: string = issue?.milestone?.title
+  let shouldRemove = false
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
   if (labelOperator === 'and') {
@@ -56,6 +86,19 @@ export async function addToProject(): Promise<void> {
       return
     }
   }
+
+  // Ensure the issue matches our `milestoned` filter, which is always "OR"
+  if (milestoned.length > 0 && !milestoned.includes(issueMilestone)) {
+    if ( removeUnmatched === "true" || removeUnmatched === "True" ) {
+      core.info(`Removing issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
+      shouldRemove = true
+    }
+    else {
+      core.info(`Skipping issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
+      return
+    }
+  }
+
 
   core.debug(`Project URL: ${projectUrl}`)
 
@@ -95,24 +138,85 @@ export async function addToProject(): Promise<void> {
   core.debug(`Project node ID: ${projectId}`)
   core.debug(`Content ID: ${contentId}`)
 
-  // Next, use the GraphQL API to add the issue to the project.
-  const addResp = await octokit.graphql<ProjectAddItemResponse>(
-    `mutation addIssueToProject($input: AddProjectNextItemInput!) {
+  if ( shouldRemove && issue ) {
+    let item = null
+    let hasNextPage = true
+    let cursor = null
+
+    while ( !item && hasNextPage ) {
+      // Find the project item if it exists
+      let response: ProjectNextItemResponse;
+      response = await octokit.graphql<ProjectNextItemResponse>(`
+        query projectIssues($org: String!, $number: Int!, $after: String) {
+          organization(login: $org) {
+            projectNext(number: $number) {
+              items(first: 100, after: $after) {
+                pageInfo {
+                  startCursor
+                  endCursor
+                  hasNextPage
+                }
+                totalCount
+                nodes {
+                  id
+                  content {
+                    ... on Issue {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        `, {
+        org: ownerName,
+        number: projectNumber,
+        after: cursor
+      });
+      if ( !response.organization ) return
+      item = response.organization.projectNext.items.nodes.find((n: ProjectNextItem) => n.content.id === issue.id)
+      hasNextPage = response.organization.projectNext.items.pageInfo.hasNextPage
+      cursor = response.organization.projectNext.items.pageInfo.endCursor
+    }
+
+    if ( !item ) return
+
+    // Remove Item from Project
+    const deletedItemId = await octokit.graphql<ProjectAddItemResponse>(
+      `mutation removeIssueFromProject($input: RemoveProjectNextItemInput!) {
+      deleteProjectNextItem(input: $input) {
+        deletedItemId
+      }
+    }`,
+      {
+        input: {
+          itemId: item.id,
+          projectId
+        }
+      }
+    )
+    core.setOutput('deletedItemId', deletedItemId)
+  }
+  else {
+    // Next, use the GraphQL API to add the issue to the project.
+    const addResp = await octokit.graphql<ProjectAddItemResponse>(
+      `mutation addIssueToProject($input: AddProjectNextItemInput!) {
       addProjectNextItem(input: $input) {
         projectNextItem {
           id
         }
       }
     }`,
-    {
-      input: {
-        contentId,
-        projectId
+      {
+        input: {
+          contentId,
+          projectId
+        }
       }
-    }
-  )
-
-  core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id)
+    )
+    core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id)
+  }
 }
 
 export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
