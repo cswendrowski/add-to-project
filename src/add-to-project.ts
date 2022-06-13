@@ -180,7 +180,10 @@ export async function addToProject(): Promise<void> {
       cursor = response.organization.projectNext.items.pageInfo.endCursor
     }
 
-    if (!item) return
+    if (!item) {
+      core.warning(`Could not find Project Item linked to Issue ${issue.id}`)
+      return
+    }
 
     // Remove Item from Project
     const deletedItemId = await octokit.graphql<ProjectAddItemResponse>(

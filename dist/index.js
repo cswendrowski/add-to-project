@@ -158,8 +158,10 @@ function addToProject() {
                 hasNextPage = response.organization.projectNext.items.pageInfo.hasNextPage;
                 cursor = response.organization.projectNext.items.pageInfo.endCursor;
             }
-            if (!item)
+            if (!item) {
+                core.warning(`Could not find Project Item linked to Issue ${issue.id}`);
                 return;
+            }
             // Remove Item from Project
             const deletedItemId = yield octokit.graphql(`mutation removeIssueFromProject($input: RemoveProjectNextItemInput!) {
       deleteProjectNextItem(input: $input) {
