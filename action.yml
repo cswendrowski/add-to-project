@@ -16,6 +16,12 @@ inputs:
   label-operator:
     required: false
     description: The behavior of the labels filter, AND to match all labels, OR to match any label (default is OR)
+  milestoned:
+    required: false
+    description: A comma-separated list of milestones to use as a filter for issue to be added or removed from project
+  remove-unmatched:
+    required: false
+    description: A boolean indicating if an unmatched issue should be removed from the Project
 runs:
   using: 'node16'
   main: 'dist/index.js'

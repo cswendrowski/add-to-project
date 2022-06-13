@@ -42,7 +42,7 @@ jobs:
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          milestoned: "milestone 1", "milestone 2"
+          milestoned: milestone 1, milestone 2
           remove-unmatched: true
 ```
 
