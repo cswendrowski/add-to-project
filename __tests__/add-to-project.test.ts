@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { addToProject, mustGetOwnerTypeQuery } from '../src/add-to-project'
+import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
 
 describe('addToProject', () => {
   let outputs: Record<string, string>
@@ -56,7 +56,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
       'github-token': 'gh_token',
-      milestoned: "Milestone 1"
+      milestoned: 'Milestone 1'
     })
 
     github.context.payload = {
@@ -65,7 +65,7 @@ describe('addToProject', () => {
         milestone: {
           id: 12345,
           number: 1,
-          title: "Milestone 1"
+          title: 'Milestone 1'
         }
       }
     }
@@ -102,7 +102,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
       'github-token': 'gh_token',
-      milestoned: "Milestone 1, Milestone 2"
+      milestoned: 'Milestone 1, Milestone 2'
     })
 
     github.context.payload = {
@@ -111,7 +111,7 @@ describe('addToProject', () => {
         milestone: {
           id: 12345,
           number: 1,
-          title: "Milestone 2"
+          title: 'Milestone 2'
         }
       }
     }
@@ -148,18 +148,18 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
       'github-token': 'gh_token',
-      milestoned: "Milestone 1, Milestone 2",
-      'remove-unmatched': "true"
+      milestoned: 'Milestone 1, Milestone 2',
+      'remove-unmatched': 'true'
     })
 
     github.context.payload = {
       issue: {
-        id: "MDU6SXNzdWUxMjY1MjMyNDMz",
+        id: 'MDU6SXNzdWUxMjY1MjMyNDMz',
         number: 1,
         milestone: {
           id: 12345,
           number: 1,
-          title: "Milestone 3"
+          title: 'Milestone 3'
         }
       }
     }
@@ -187,21 +187,21 @@ describe('addToProject', () => {
                 },
                 nodes: [
                   {
-                    "id": "PNI_lADOBlrAAM4ACXmOzgBWn7U",
-                    "content": {
-                      "id": "MDU6SXNzdWUxMjY1MjMyNDMz"
+                    id: 'PNI_lADOBlrAAM4ACXmOzgBWn7U',
+                    content: {
+                      id: 'MDU6SXNzdWUxMjY1MjMyNDMz'
                     }
                   },
                   {
-                    "id": "PNI_lADOBlrAAM4ACXmOzgBWqPM",
-                    "content": {
-                      "id": "MDU6SXNzdWUxMjY1MzAyNzIw"
+                    id: 'PNI_lADOBlrAAM4ACXmOzgBWqPM',
+                    content: {
+                      id: 'MDU6SXNzdWUxMjY1MzAyNzIw'
                     }
                   },
                   {
-                    "id": "PNI_lADOBlrAAM4ACXmOzgBWqSE",
-                    "content": {
-                      "id": "MDU6SXNzdWUxMjY1MzA0NDE5"
+                    id: 'PNI_lADOBlrAAM4ACXmOzgBWqSE',
+                    content: {
+                      id: 'MDU6SXNzdWUxMjY1MzA0NDE5'
                     }
                   }
                 ]
@@ -212,7 +212,7 @@ describe('addToProject', () => {
       },
       {
         test: /removeIssueFromProject/,
-        return: "PNI_lADOBlrAAM4ACXmOzgBWn7U"
+        return: 'PNI_lADOBlrAAM4ACXmOzgBWn7U'
       }
     )
 
@@ -231,7 +231,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'bug' }]
+        labels: [{name: 'bug'}]
       }
     }
 
@@ -274,7 +274,7 @@ describe('addToProject', () => {
       // eslint-disable-next-line camelcase
       pull_request: {
         number: 1,
-        labels: [{ name: 'bug' }]
+        labels: [{name: 'bug'}]
       }
     }
 
@@ -338,7 +338,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'bug' }, { name: 'new' }]
+        labels: [{name: 'bug'}, {name: 'new'}]
       }
     }
 
@@ -381,7 +381,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'bug' }, { name: 'other' }]
+        labels: [{name: 'bug'}, {name: 'other'}]
       }
     }
 
@@ -402,7 +402,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'accessibility' }, { name: 'backend' }]
+        labels: [{name: 'accessibility'}, {name: 'backend'}]
       }
     }
 
@@ -448,7 +448,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'data' }, { name: 'frontend' }, { name: 'improvement' }]
+        labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}]
       }
     }
 
@@ -471,7 +471,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'accessibility' }, { name: 'backend' }, { name: 'bug' }],
+        labels: [{name: 'accessibility'}, {name: 'backend'}, {name: 'bug'}],
         'label-operator': 'AND'
       }
     }
@@ -562,7 +562,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'bug' }]
+        labels: [{name: 'bug'}]
       }
     }
 
@@ -607,7 +607,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'bug' }]
+        labels: [{name: 'bug'}]
       }
     }
 
@@ -674,7 +674,7 @@ function mockSetOutput(): Record<string, string> {
   return output
 }
 
-function mockGraphQL(...mocks: { test: RegExp; return: unknown }[]): jest.Mock {
+function mockGraphQL(...mocks: {test: RegExp; return: unknown}[]): jest.Mock {
   const mock = jest.fn().mockImplementation((query: string) => {
     const match = mocks.find(m => m.test.test(query))
 

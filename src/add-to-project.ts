@@ -29,7 +29,7 @@ interface ProjectAddItemResponse {
 }
 
 interface ProjectNextItem {
-  id: string,
+  id: string
   content: {
     id: string
   }
@@ -50,8 +50,8 @@ interface ProjectNextItemResponse {
 }
 
 export async function addToProject(): Promise<void> {
-  const projectUrl = core.getInput('project-url', { required: true })
-  const ghToken = core.getInput('github-token', { required: true })
+  const projectUrl = core.getInput('project-url', {required: true})
+  const ghToken = core.getInput('github-token', {required: true})
   const labeled =
     core
       .getInput('labeled')
@@ -65,12 +65,12 @@ export async function addToProject(): Promise<void> {
       .split(',')
       .map(l => l.trim())
       .filter(l => l.length > 0) ?? []
-  const removeUnmatched = core.getInput("remove-unmatched")
+  const removeUnmatched = core.getInput('remove-unmatched')
 
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
-  const issueLabels: string[] = (issue?.labels ?? []).map((l: { name: string }) => l.name)
+  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
   const issueMilestone: string = issue?.milestone?.title
   let shouldRemove = false
 
@@ -89,16 +89,14 @@ export async function addToProject(): Promise<void> {
 
   // Ensure the issue matches our `milestoned` filter, which is always "OR"
   if (milestoned.length > 0 && !milestoned.includes(issueMilestone)) {
-    if ( removeUnmatched === "true" || removeUnmatched === "True" ) {
+    if (removeUnmatched === 'true' || removeUnmatched === 'True') {
       core.info(`Removing issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
       shouldRemove = true
-    }
-    else {
+    } else {
       core.info(`Skipping issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
       return
     }
   }
-
 
   core.debug(`Project URL: ${projectUrl}`)
 
@@ -138,15 +136,15 @@ export async function addToProject(): Promise<void> {
   core.debug(`Project node ID: ${projectId}`)
   core.debug(`Content ID: ${contentId}`)
 
-  if ( shouldRemove && issue ) {
+  if (shouldRemove && issue) {
     let item = null
     let hasNextPage = true
     let cursor = null
 
-    while ( !item && hasNextPage ) {
+    while (!item && hasNextPage) {
       // Find the project item if it exists
-      let response: ProjectNextItemResponse;
-      response = await octokit.graphql<ProjectNextItemResponse>(`
+      const response: ProjectNextItemResponse = await octokit.graphql<ProjectNextItemResponse>(
+        `
         query projectIssues($org: String!, $number: Int!, $after: String) {
           organization(login: $org) {
             projectNext(number: $number) {
@@ -169,18 +167,20 @@ export async function addToProject(): Promise<void> {
             }
           }
         }
-        `, {
-        org: ownerName,
-        number: projectNumber,
-        after: cursor
-      });
-      if ( !response.organization ) return
+        `,
+        {
+          org: ownerName,
+          number: projectNumber,
+          after: cursor
+        }
+      )
+      if (!response.organization) return
       item = response.organization.projectNext.items.nodes.find((n: ProjectNextItem) => n.content.id === issue.id)
       hasNextPage = response.organization.projectNext.items.pageInfo.hasNextPage
       cursor = response.organization.projectNext.items.pageInfo.endCursor
     }
 
-    if ( !item ) return
+    if (!item) return
 
     // Remove Item from Project
     const deletedItemId = await octokit.graphql<ProjectAddItemResponse>(
@@ -197,8 +197,7 @@ export async function addToProject(): Promise<void> {
       }
     )
     core.setOutput('deletedItemId', deletedItemId)
-  }
-  else {
+  } else {
     // Next, use the GraphQL API to add the issue to the project.
     const addResp = await octokit.graphql<ProjectAddItemResponse>(
       `mutation addIssueToProject($input: AddProjectNextItemInput!) {
