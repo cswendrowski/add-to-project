@@ -175,13 +175,13 @@ export async function addToProject(): Promise<void> {
         }
       )
       if (!response.organization) return
-      item = response.organization.projectNext.items.nodes.find((n: ProjectNextItem) => n.content.id === issue.id)
+      item = response.organization.projectNext.items.nodes.find((n: ProjectNextItem) => n.content.id === issue.node_id)
       hasNextPage = response.organization.projectNext.items.pageInfo.hasNextPage
       cursor = response.organization.projectNext.items.pageInfo.endCursor
     }
 
     if (!item) {
-      core.warning(`Could not find Project Item linked to Issue ${issue.id}`)
+      core.warning(`Could not find Project Item linked to Issue ${issue.node_id}`)
       return
     }
 
