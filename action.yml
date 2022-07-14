@@ -22,6 +22,9 @@ inputs:
   remove-unmatched:
     required: false
     description: A boolean indicating if an unmatched issue should be removed from the Project
+  fuzzy-match:
+    required: false
+    description: A boolean indicating if milestone matching should be done with fuzzy starts-with matching
 runs:
   using: 'node16'
   main: 'dist/index.js'
