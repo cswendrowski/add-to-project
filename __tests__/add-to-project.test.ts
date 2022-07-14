@@ -98,6 +98,53 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-next-item-id')
   })
 
+  test('adds matching issues with a fuzzy match milestone filter', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      milestoned: 'Milestone',
+      'fuzzy-match': 'true'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        milestone: {
+          id: 12345,
+          number: 1,
+          title: 'Milestone 1'
+        }
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-next-item-id')
+  })
+
   test('adds matching issues with multiple milestone filters', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',

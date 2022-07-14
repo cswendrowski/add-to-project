@@ -44,6 +44,7 @@ jobs:
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           milestoned: milestone 1, milestone 2
           remove-unmatched: true
+          fuzzy-match: false
 ```
 
 ##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`

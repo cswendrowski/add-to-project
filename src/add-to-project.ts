@@ -66,6 +66,7 @@ export async function addToProject(): Promise<void> {
       .map(l => l.trim())
       .filter(l => l.length > 0) ?? []
   const removeUnmatched = core.getInput('remove-unmatched')
+  const fuzzyMatch = core.getInput('fuzzy-match');
 
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
@@ -73,6 +74,7 @@ export async function addToProject(): Promise<void> {
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
   const issueMilestone: string = issue?.milestone?.title
   let shouldRemove = false
+  let shouldFuzzyMatch = false
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
   if (labelOperator === 'and') {
@@ -87,8 +89,18 @@ export async function addToProject(): Promise<void> {
     }
   }
 
+  if ( fuzzyMatch === 'true' || fuzzyMatch === 'True' ) {
+    shouldFuzzyMatch = true;
+    core.info("Using fuzzy matching for milestones");
+  }
+
+  function milestoneEnabled(milestone: string) {
+    if ( !shouldFuzzyMatch ) return milestoned.includes(milestone);
+    return milestoned.some(m => milestone.startsWith(m));
+  }
+
   // Ensure the issue matches our `milestoned` filter, which is always "OR"
-  if (milestoned.length > 0 && !milestoned.includes(issueMilestone)) {
+  if (milestoned.length > 0 && !milestoneEnabled(issueMilestone)) {
     if (removeUnmatched === 'true' || removeUnmatched === 'True') {
       core.info(`Removing issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
       shouldRemove = true
