@@ -62,12 +62,15 @@ function addToProject() {
             .map(l => l.trim())
             .filter(l => l.length > 0)) !== null && _b !== void 0 ? _b : [];
         const removeUnmatched = core.getInput('remove-unmatched');
+        const fuzzyMatch = core.getInput('fuzzy-match');
+        core.debug(`fuzzy-match: ${fuzzyMatch}`);
         const octokit = github.getOctokit(ghToken);
         const urlMatch = projectUrl.match(urlParse);
         const issue = (_c = github.context.payload.issue) !== null && _c !== void 0 ? _c : github.context.payload.pull_request;
         const issueLabels = ((_d = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _d !== void 0 ? _d : []).map((l) => l.name);
         const issueMilestone = (_e = issue === null || issue === void 0 ? void 0 : issue.milestone) === null || _e === void 0 ? void 0 : _e.title;
         let shouldRemove = false;
+        let shouldFuzzyMatch = false;
         // Ensure the issue matches our `labeled` filter based on the label-operator.
         if (labelOperator === 'and') {
             if (!labeled.every(l => issueLabels.includes(l))) {
@@ -81,14 +84,23 @@ function addToProject() {
                 return;
             }
         }
+        if (fuzzyMatch === 'true' || fuzzyMatch === 'True') {
+            shouldFuzzyMatch = true;
+            core.info('Using fuzzy matching for milestones');
+        }
+        function milestoneEnabled(milestone) {
+            if (!shouldFuzzyMatch)
+                return milestoned.includes(milestone);
+            return milestoned.some(m => milestone.startsWith(m));
+        }
         // Ensure the issue matches our `milestoned` filter, which is always "OR"
-        if (milestoned.length > 0 && !milestoned.includes(issueMilestone)) {
+        if (milestoned.length > 0 && !milestoneEnabled(issueMilestone)) {
             if (removeUnmatched === 'true' || removeUnmatched === 'True') {
-                core.info(`Removing issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it is not one of the milestones: ${milestoned.join(', ')}`);
+                core.info(`Removing issue ${issue === null || issue === void 0 ? void 0 : issue.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(', ')}`);
                 shouldRemove = true;
             }
             else {
-                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it is not one of the milestones: ${milestoned.join(', ')}`);
+                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(', ')}`);
                 return;
             }
         }
