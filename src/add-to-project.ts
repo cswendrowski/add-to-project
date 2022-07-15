@@ -66,7 +66,8 @@ export async function addToProject(): Promise<void> {
       .map(l => l.trim())
       .filter(l => l.length > 0) ?? []
   const removeUnmatched = core.getInput('remove-unmatched')
-  const fuzzyMatch = core.getInput('fuzzy-match');
+  const fuzzyMatch = core.getInput('fuzzy-match')
+  core.debug(`fuzzy-match: ${fuzzyMatch}`)
 
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
@@ -102,10 +103,10 @@ export async function addToProject(): Promise<void> {
   // Ensure the issue matches our `milestoned` filter, which is always "OR"
   if (milestoned.length > 0 && !milestoneEnabled(issueMilestone)) {
     if (removeUnmatched === 'true' || removeUnmatched === 'True') {
-      core.info(`Removing issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
+      core.info(`Removing issue ${issue?.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(', ')}`)
       shouldRemove = true
     } else {
-      core.info(`Skipping issue ${issue?.number} because it is not one of the milestones: ${milestoned.join(', ')}`)
+      core.info(`Skipping issue ${issue?.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(', ')}`)
       return
     }
   }
