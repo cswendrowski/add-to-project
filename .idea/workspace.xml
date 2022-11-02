@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cb33009e-39d8-435d-87bc-79253ffd4f7d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.eslintrc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/dependabot.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/dependabot.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/check-dist.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/check-dist.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/codeql-analysis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/codeql-analysis.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/licensed.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/licensed.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/test.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licensed.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licensed.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@actions/core.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@actions/core.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@actions/github.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@actions/github.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@actions/http-client.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@actions/http-client.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/auth-token.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/auth-token.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/core.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/core.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/endpoint.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/endpoint.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/graphql.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/graphql.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/openapi-types.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/openapi-types.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/plugin-paginate-rest.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/plugin-paginate-rest.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/plugin-rest-endpoint-methods.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/plugin-rest-endpoint-methods.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/request-error.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/request-error.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/request.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/request.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/@octokit/types.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/@octokit/types.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/before-after-hook.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/before-after-hook.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/deprecation.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/deprecation.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/is-plain-object.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/is-plain-object.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/node-fetch.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/node-fetch.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/once.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/once.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/tr46.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/tr46.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/tunnel.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/tunnel.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/universal-user-agent.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/universal-user-agent.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/webidl-conversions.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/webidl-conversions.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/whatwg-url.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/whatwg-url.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.licenses/npm/wrappy.dep.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.licenses/npm/wrappy.dep.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jest.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/jest.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2AXF2kufTue1Ml6Sgrc2ULqdSXT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "F:/Programming/Git/add-to-project/node_modules/jest",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "F:\\Programming\\Git\\add-to-project\\node_modules\\prettier",
+    "ts.external.directory.path": "C:\\Users\\Cody\\AppData\\Local\\JetBrains\\Toolbox\\apps\\WebStorm\\ch-0\\222.3739.57\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="Jest.addToProject.adds matching issues with a fuzzy match milestone filter">
+    <configuration name="All Tests" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="ALL" />
+      <method v="2" />
+    </configuration>
+    <configuration name="addToProject.adds matching issues with a fuzzy match milestone filter" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/__tests__/add-to-project.test.ts" />
+      <test-names>
+        <test-name value="addToProject" />
+        <test-name value="adds matching issues with a fuzzy match milestone filter" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="addToProject.remove nonmatching issue with multiple milestone filters" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/__tests__/add-to-project.test.ts" />
+      <test-names>
+        <test-name value="addToProject" />
+        <test-name value="remove nonmatching issue with multiple milestone filters" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Jest.All Tests" />
+      <item itemvalue="Jest.addToProject.adds matching issues with a fuzzy match milestone filter" />
+      <item itemvalue="Jest.addToProject.remove nonmatching issue with multiple milestone filters" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Jest.addToProject.adds matching issues with a fuzzy match milestone filter" />
+        <item itemvalue="Jest.addToProject.remove nonmatching issue with multiple milestone filters" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb33009e-39d8-435d-87bc-79253ffd4f7d" name="Changes" comment="" />
+      <created>1655147819785</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1655147819785</updated>
+      <workItem from="1655147821945" duration="6634000" />
+      <workItem from="1655689444106" duration="595000" />
+      <workItem from="1657810340605" duration="1896000" />
+      <workItem from="1657820892522" duration="798000" />
+      <workItem from="1657898987898" duration="1252000" />
+      <workItem from="1667403973489" duration="2073000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

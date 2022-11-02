@@ -36,6 +36,27 @@ interface ProjectV2AddDraftIssueResponse {
   }
 }
 
+interface ProjectV2Item {
+  id: string
+  content: {
+    id: string
+  }
+}
+
+interface ProjectV2ItemResponse {
+  organization?: {
+    projectNext: {
+      items: {
+        pageInfo: {
+          endCursor: string
+          hasNextPage: boolean
+        }
+        nodes: ProjectV2Item[]
+      }
+    }
+  }
+}
+
 export async function addToProject(): Promise<void> {
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
@@ -85,23 +106,31 @@ export async function addToProject(): Promise<void> {
     }
   }
 
-  if ( fuzzyMatch === 'true' || fuzzyMatch === 'True' ) {
-    shouldFuzzyMatch = true;
-    core.info("Using fuzzy matching for milestones");
+  if (fuzzyMatch === 'true' || fuzzyMatch === 'True') {
+    shouldFuzzyMatch = true
+    core.info('Using fuzzy matching for milestones')
   }
 
   function milestoneEnabled(milestone: string) {
-    if ( !shouldFuzzyMatch ) return milestoned.includes(milestone);
-    return milestoned.some(m => milestone.startsWith(m));
+    if (!shouldFuzzyMatch) return milestoned.includes(milestone)
+    return milestoned.some(m => milestone.startsWith(m))
   }
 
   // Ensure the issue matches our `milestoned` filter, which is always "OR"
   if (milestoned.length > 0 && !milestoneEnabled(issueMilestone)) {
     if (removeUnmatched === 'true' || removeUnmatched === 'True') {
-      core.info(`Removing issue ${issue?.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(', ')}`)
+      core.info(
+        `Removing issue ${issue?.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(
+          ', '
+        )}`
+      )
       shouldRemove = true
     } else {
-      core.info(`Skipping issue ${issue?.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(', ')}`)
+      core.info(
+        `Skipping issue ${issue?.number} because ${issueMilestone} is not one of the milestones: ${milestoned.join(
+          ', '
+        )}`
+      )
       return
     }
   }
@@ -153,11 +182,11 @@ export async function addToProject(): Promise<void> {
 
     while (!item && hasNextPage) {
       // Find the project item if it exists
-      const response: ProjectNextItemResponse = await octokit.graphql<ProjectNextItemResponse>(
+      const response: ProjectV2ItemResponse = await octokit.graphql<ProjectV2ItemResponse>(
         `
         query projectIssues($org: String!, $number: Int!, $after: String) {
           organization(login: $org) {
-            projectNext(number: $number) {
+            projectV2(number: $number) {
               items(first: 100, after: $after) {
                 pageInfo {
                   startCursor
@@ -179,13 +208,13 @@ export async function addToProject(): Promise<void> {
         }
         `,
         {
-          org: ownerName,
+          org: projectOwnerName,
           number: projectNumber,
           after: cursor
         }
       )
       if (!response.organization) return
-      item = response.organization.projectNext.items.nodes.find((n: ProjectNextItem) => n.content.id === issue.node_id)
+      item = response.organization.projectNext.items.nodes.find((n: ProjectV2Item) => n.content.id === issue.node_id)
       hasNextPage = response.organization.projectNext.items.pageInfo.hasNextPage
       cursor = response.organization.projectNext.items.pageInfo.endCursor
     }
@@ -198,7 +227,7 @@ export async function addToProject(): Promise<void> {
     // Remove Item from Project
     const deletedItemId = await octokit.graphql<ProjectAddItemResponse>(
       `mutation removeIssueFromProject($input: DeleteProjectNextItemInput!){
-        deleteProjectNextItem(input: $input) {
+        deleteProjectV2Item(input: $input) {
           deletedItemId
         }
       }
@@ -213,28 +242,50 @@ export async function addToProject(): Promise<void> {
     core.setOutput('deletedItemId', deletedItemId)
   } else {
     // Next, use the GraphQL API to add the issue to the project.
-    const addResp = await octokit.graphql<ProjectAddItemResponse>(
-      `mutation addIssueToProject($input: AddProjectNextItemInput!) {
-      addProjectNextItem(input: $input) {
-        projectNextItem {
-          id
+    // If the issue has the same owner as the project, we can directly
+    // add a project item. Otherwise, we add a draft issue.
+    if (issueOwnerName === projectOwnerName) {
+      core.info('Creating project item')
+
+      const addResp = await octokit.graphql<ProjectAddItemResponse>(
+        `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+        addProjectV2ItemById(input: $input) {
+          item {
+            id
+          }
         }
       }`,
-      {
-        input: {
+        {
+          input: {
+            projectId,
+            contentId
+          }
+        }
+      )
+
+      core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+    } else {
+      core.info('Creating draft issue in project')
+
+      const addResp = await octokit.graphql<ProjectV2AddDraftIssueResponse>(
+        `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
+        addProjectV2DraftIssue(input: {
+          projectId: $projectId,
+          title: $title
+        }) {
+          projectItem {
+            id
+          }
+        }
+      }`,
+        {
           projectId,
-          contentId
+          title: issue?.html_url
         }
-      }
-    }`,
-      {
-        input: {
-          contentId,
-          projectId
-        }
-      }
-    )
-    core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id)
+      )
+
+      core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+    }
   }
 }
 
