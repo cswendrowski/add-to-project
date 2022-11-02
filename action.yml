@@ -1,5 +1,5 @@
-name: Add To GitHub Projects Beta
-description: Automatically add issues and PRs to GitHub projects beta
+name: Add To GitHub projects
+description: Automatically add issues and PRs to GitHub projects
 author: GitHub
 branding:
   icon: table
@@ -15,7 +15,7 @@ inputs:
     description: A comma-separated list of labels to use as a filter for issue to be added
   label-operator:
     required: false
-    description: The behavior of the labels filter, AND to match all labels, OR to match any label (default is OR)
+    description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
   milestoned:
     required: false
     description: A comma-separated list of milestones to use as a filter for issue to be added or removed from project

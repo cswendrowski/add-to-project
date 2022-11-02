@@ -8,43 +8,30 @@ const urlParse =
 
 interface ProjectNodeIDResponse {
   organization?: {
-    projectNext: {
+    projectV2: {
       id: string
     }
   }
 
   user?: {
-    projectNext: {
+    projectV2: {
       id: string
     }
   }
 }
 
 interface ProjectAddItemResponse {
-  addProjectNextItem: {
-    projectNextItem: {
+  addProjectV2ItemById: {
+    item: {
       id: string
     }
   }
 }
 
-interface ProjectNextItem {
-  id: string
-  content: {
-    id: string
-  }
-}
-
-interface ProjectNextItemResponse {
-  organization?: {
-    projectNext: {
-      items: {
-        pageInfo: {
-          endCursor: string
-          hasNextPage: boolean
-        }
-        nodes: ProjectNextItem[]
-      }
+interface ProjectV2AddDraftIssueResponse {
+  addProjectV2DraftIssue: {
+    projectItem: {
+      id: string
     }
   }
 }
@@ -56,7 +43,7 @@ export async function addToProject(): Promise<void> {
     core
       .getInput('labeled')
       .split(',')
-      .map(l => l.trim())
+      .map(l => l.trim().toLowerCase())
       .filter(l => l.length > 0) ?? []
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
   const milestoned =
@@ -70,17 +57,25 @@ export async function addToProject(): Promise<void> {
   core.debug(`fuzzy-match: ${fuzzyMatch}`)
 
   const octokit = github.getOctokit(ghToken)
-  const urlMatch = projectUrl.match(urlParse)
+
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
-  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
+  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
   const issueMilestone: string = issue?.milestone?.title
+  const issueOwnerName = github.context.payload.repository?.owner.login
   let shouldRemove = false
   let shouldFuzzyMatch = false
+
+  core.debug(`Issue/PR owner: ${issueOwnerName}`)
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
   if (labelOperator === 'and') {
     if (!labeled.every(l => issueLabels.includes(l))) {
       core.info(`Skipping issue ${issue?.number} because it doesn't match all the labels: ${labeled.join(', ')}`)
+      return
+    }
+  } else if (labelOperator === 'not') {
+    if (labeled.length > 0 && issueLabels.some(l => labeled.includes(l))) {
+      core.info(`Skipping issue ${issue?.number} because it contains one of the labels: ${labeled.join(', ')}`)
       return
     }
   } else {
@@ -113,37 +108,39 @@ export async function addToProject(): Promise<void> {
 
   core.debug(`Project URL: ${projectUrl}`)
 
+  const urlMatch = projectUrl.match(urlParse)
+
   if (!urlMatch) {
     throw new Error(
       `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`
     )
   }
 
-  const ownerName = urlMatch.groups?.ownerName
+  const projectOwnerName = urlMatch.groups?.ownerName
   const projectNumber = parseInt(urlMatch.groups?.projectNumber ?? '', 10)
   const ownerType = urlMatch.groups?.ownerType
   const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType)
 
-  core.debug(`Org name: ${ownerName}`)
+  core.debug(`Project owner: ${projectOwnerName}`)
   core.debug(`Project number: ${projectNumber}`)
-  core.debug(`Owner type: ${ownerType}`)
+  core.debug(`Project owner type: ${ownerType}`)
 
   // First, use the GraphQL API to request the project's node ID.
   const idResp = await octokit.graphql<ProjectNodeIDResponse>(
-    `query getProject($ownerName: String!, $projectNumber: Int!) { 
-      ${ownerTypeQuery}(login: $ownerName) {
-        projectNext(number: $projectNumber) {
+    `query getProject($projectOwnerName: String!, $projectNumber: Int!) {
+      ${ownerTypeQuery}(login: $projectOwnerName) {
+        projectV2(number: $projectNumber) {
           id
         }
       }
     }`,
     {
-      ownerName,
+      projectOwnerName,
       projectNumber
     }
   )
 
-  const projectId = idResp[ownerTypeQuery]?.projectNext.id
+  const projectId = idResp[ownerTypeQuery]?.projectV2.id
   const contentId = issue?.node_id
 
   core.debug(`Project node ID: ${projectId}`)
@@ -221,6 +218,12 @@ export async function addToProject(): Promise<void> {
       addProjectNextItem(input: $input) {
         projectNextItem {
           id
+        }
+      }`,
+      {
+        input: {
+          projectId,
+          contentId
         }
       }
     }`,

@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+
 import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
 
 describe('addToProject', () => {
@@ -11,7 +12,7 @@ describe('addToProject', () => {
 
   beforeEach(() => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token'
     })
 
@@ -23,24 +24,39 @@ describe('addToProject', () => {
     jest.restoreAllMocks()
   })
 
-  test('adds an issue to the project', async () => {
+  test('adds an issue from the same organization to the project', async () => {
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
+      }
+    }
+
     mockGraphQL(
       {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -49,7 +65,51 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
+  })
+
+  test('adds an issue from a different organization to the project', async () => {
+    github.context.payload = {
+      issue: {
+        number: 2221,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/octokit/octokit.js/issues/2221'
+      },
+      repository: {
+        name: 'octokit.js',
+        owner: {
+          login: 'octokit'
+        }
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectV2DraftIssue/,
+        return: {
+          addProjectV2DraftIssue: {
+            projectItem: {
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('adds matching issues with a milestone filter', async () => {
@@ -270,7 +330,7 @@ describe('addToProject', () => {
 
   test('adds matching issues with a label filter without label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new'
     })
@@ -278,7 +338,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -287,18 +355,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -307,12 +375,12 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('adds matching pull-requests with a label filter without label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new'
     })
@@ -321,7 +389,15 @@ describe('addToProject', () => {
       // eslint-disable-next-line camelcase
       pull_request: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/pull/136'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -330,18 +406,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -350,12 +426,12 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('does not add un-matching issues with a label filter without label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug'
     })
@@ -363,7 +439,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: []
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -376,7 +460,7 @@ describe('addToProject', () => {
 
   test('adds matching issues with labels filter with AND label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
       'label-operator': 'AND'
@@ -385,7 +469,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}, {name: 'new'}]
+        labels: [{name: 'bug'}, {name: 'new'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -394,17 +486,128 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
+            projectV2: {
+              id: 'project-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectV2ItemById/,
+        return: {
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-item-id')
+  })
+
+  test('does not add un-matching issues with labels filter with AND label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/actions/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'AND'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}, {name: 'other'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await addToProject()
+    expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it doesn't match all the labels: bug, new`)
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+
+  test('does not add matching issues with labels filter with NOT label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/actions/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'NOT'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await addToProject()
+    expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it contains one of the labels: bug, new`)
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+
+  test('adds issues that do not have labels present in the label list with NOT label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/actions/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'NOT'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'other'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
               id: 'project-next-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
+          addProjectV2ItemById: {
+            item: {
               id: 'project-next-item-id'
             }
           }
@@ -417,31 +620,9 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-next-item-id')
   })
 
-  test('does not add un-matching issues with labels filter with AND label-operator', async () => {
-    mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
-      'github-token': 'gh_token',
-      labeled: 'bug, new',
-      'label-operator': 'AND'
-    })
-
-    github.context.payload = {
-      issue: {
-        number: 1,
-        labels: [{name: 'bug'}, {name: 'other'}]
-      }
-    }
-
-    const infoSpy = jest.spyOn(core, 'info')
-    const gqlMock = mockGraphQL()
-    await addToProject()
-    expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it doesn't match all the labels: bug, new`)
-    expect(gqlMock).not.toHaveBeenCalled()
-  })
-
   test('adds matching issues with multiple label filters', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'accessibility,backend,bug'
     })
@@ -449,7 +630,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'accessibility'}, {name: 'backend'}]
+        labels: [{name: 'accessibility'}, {name: 'backend'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -458,18 +647,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -481,13 +670,15 @@ describe('addToProject', () => {
     await addToProject()
 
     expect(gqlMock).toHaveBeenCalled()
-    expect(infoSpy).not.toHaveBeenCalled()
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(infoSpy).toHaveBeenCalledWith('Creating project item')
+    // We shouldn't have any logs relating to the issue being skipped
+    expect(infoSpy.mock.calls.length).toEqual(1)
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('does not add un-matching issues with multiple label filters', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'accessibility, backend, bug'
     })
@@ -495,7 +686,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}]
+        labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -510,7 +709,7 @@ describe('addToProject', () => {
 
   test('handles spaces and extra commas gracefully in label filter input', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'accessibility  ,   backend    ,,  . ,     bug'
     })
@@ -519,7 +718,15 @@ describe('addToProject', () => {
       issue: {
         number: 1,
         labels: [{name: 'accessibility'}, {name: 'backend'}, {name: 'bug'}],
-        'label-operator': 'AND'
+        'label-operator': 'AND',
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -528,18 +735,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -551,8 +758,10 @@ describe('addToProject', () => {
     await addToProject()
 
     expect(gqlMock).toHaveBeenCalled()
-    expect(infoSpy).not.toHaveBeenCalled()
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(infoSpy).toHaveBeenCalledWith('Creating project item')
+    // We shouldn't have any logs relating to the issue being skipped
+    expect(infoSpy.mock.calls.length).toEqual(1)
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test(`throws an error when url isn't a valid project url`, async () => {
@@ -564,7 +773,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: []
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -586,7 +803,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: []
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -601,7 +826,7 @@ describe('addToProject', () => {
 
   test('constructs the correct graphQL query given an organization owner', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new'
     })
@@ -609,7 +834,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -618,18 +851,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -638,8 +871,8 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $ownerName)'), {
-      ownerName: 'github',
+    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $projectOwnerName)'), {
+      projectOwnerName: 'actions',
       projectNumber: 1
     })
   })
@@ -654,7 +887,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/monalisa/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'monalisa'
+        }
       }
     }
 
@@ -663,17 +904,71 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
+            projectV2: {
+              id: 'project-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectV2ItemById/,
+        return: {
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $projectOwnerName)'), {
+      projectOwnerName: 'monalisa',
+      projectNumber: 1
+    })
+  })
+
+  test('compares labels case-insensitively', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/actions/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'FOO, Bar, baz',
+      'label-operator': 'AND'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'foo'}, {name: 'BAR'}, {name: 'baz'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
               id: 'project-next-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
+          addProjectV2ItemById: {
+            item: {
               id: 'project-next-item-id'
             }
           }
@@ -683,10 +978,7 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $ownerName)'), {
-      ownerName: 'monalisa',
-      projectNumber: 1
-    })
+    expect(outputs.itemId).toEqual('project-next-item-id')
   })
 })
 
